@@ -50,7 +50,6 @@ exports.registerUser = async (req, res) => {
 // Login User function
 exports.loginUser = async (req, res) => {
   try {
-    console.log("Request Body:", req.body); // Debugging line
     // Validate user input using Joi
     const { error } = loginValidation(req.body);
     if (error) {
