@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const registerValidation = require("../helpers/registerValidation");
 const loginValidation = require("../helpers/loginValidation");
+const userService = require("../services/userService");
 
 // Register User function
 exports.registerUser = async (req, res) => {
@@ -22,28 +23,21 @@ exports.registerUser = async (req, res) => {
       isBusiness,
     } = req.body;
 
-    //Check if user already exist
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (await userService.isExist(email)) {
       return res.status(400).json({ message: "User Already Exists" });
     }
 
-    //Hash the Password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     //Create and save the new user
-    const newUser = new User({
+    const newUser = await userService.create({
       name,
       phone,
       email,
-      password: hashedPassword,
+      password,
       image,
       address,
       isAdmin: isAdmin || false,
       isBusiness: isBusiness || false,
     });
-
-    await newUser.save();
 
     res
       .status(201)
