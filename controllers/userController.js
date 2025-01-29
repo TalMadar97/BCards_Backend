@@ -97,6 +97,10 @@ exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (req.user.id !== id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const user = await User.findById(id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
