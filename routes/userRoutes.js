@@ -6,6 +6,7 @@ const {
   getAllUsers,
   getUserById,
   updateUser,
+  toggleBusinessStatus,
 } = require("../controllers/userController");
 
 const {
@@ -28,5 +29,8 @@ router.get("/:id", authenticate, getUserById);
 
 // Route: Update user (Only allowed fields)
 router.put("/:id", authenticate, updateUser);
+
+// Route: Update boolean isBusiness
+router.patch("/:id", authenticate, toggleBusinessStatus);
 
 module.exports = router;

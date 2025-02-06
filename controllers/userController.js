@@ -6,6 +6,7 @@ const loginValidation = require("../helpers/loginValidation");
 const userService = require("../services/userService");
 const { updateUserById } = require("../services/userService");
 const updateUserValidation = require("../helpers/updateValidation");
+const booleanValidation = require("../helpers/booleanValidation");
 
 
 // Register User function
@@ -153,3 +154,37 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// change isBusiness Boolean
+exports.toggleBusinessStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate request payload using Joi
+    const { error } = booleanValidation(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    // Find the user
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user is authorized to change this status
+    if (req.user.id !== user._id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Update the boolean value
+    user.isBusiness = req.body.isBusiness;
+    await user.save();
+
+    res.status(200).json({
+      message: "User business status updated successfully",
+      isBusiness: user.isBusiness,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
