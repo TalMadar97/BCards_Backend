@@ -26,4 +26,18 @@ async function isExist(email) {
   return user ? true : false;
 }
 
-module.exports = { create, isExist };
+const updateUserById = async (id, updateData) => {
+  try {
+    // Update user data
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password -email"); 
+
+    return updatedUser;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+module.exports = { create, isExist, updateUserById };

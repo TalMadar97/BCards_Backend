@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 const registerValidation = require("../helpers/registerValidation");
 const loginValidation = require("../helpers/loginValidation");
 const userService = require("../services/userService");
+const { updateUserById } = require("../services/userService");
+const updateUserValidation = require("../helpers/updateValidation");
+
 
 // Register User function
 exports.registerUser = async (req, res) => {
@@ -111,3 +114,42 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+//Update User
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Ensure the requesting user is updating their own profile or is an admin
+    if (req.user.id !== id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Prevent updates to email and password
+    if (req.body.email || req.body.password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password cannot be changed" });
+    }
+
+    // Validate request payload using Joi
+    const { error } = updateUserValidation(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    // Call the user service to update the user
+    const updatedUser = await updateUserById(id, req.body);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+

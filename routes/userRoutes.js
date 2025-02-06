@@ -5,6 +5,7 @@ const {
   loginUser,
   getAllUsers,
   getUserById,
+  updateUser,
 } = require("../controllers/userController");
 
 const {
@@ -24,5 +25,8 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
 
 // Route: Get user by ID
 router.get("/:id", authenticate, getUserById);
+
+// Route: Update user (Only allowed fields)
+router.put("/:id", authenticate, updateUser);
 
 module.exports = router;
