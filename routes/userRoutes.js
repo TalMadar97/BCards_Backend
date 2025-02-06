@@ -7,6 +7,7 @@ const {
   getUserById,
   updateUser,
   toggleBusinessStatus,
+  deleteUser,
 } = require("../controllers/userController");
 
 const {
@@ -32,5 +33,8 @@ router.put("/:id", authenticate, updateUser);
 
 // Route: Update boolean isBusiness
 router.patch("/:id", authenticate, toggleBusinessStatus);
+
+// Route: Delete user
+router.delete("/:id", authenticate, deleteUser);
 
 module.exports = router;
