@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getAllCards, getUserCards, getCardById, createCard, updateCard } = require("../controllers/cardController");
+const { getAllCards, getUserCards, getCardById, createCard, updateCard, likeCard } = require("../controllers/cardController");
 const { authenticate } = require("../middlewares/authMiddleware");
 
 // Get all cards (Public)
@@ -17,5 +17,8 @@ router.post("/", authenticate, createCard);
 
 // Update a card (Only the creator)
 router.put("/:id", authenticate, updateCard);
+
+// Like or Unlike a card (Any registered user)
+router.patch("/:id", authenticate, likeCard);
 
 module.exports = router;

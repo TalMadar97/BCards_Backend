@@ -86,6 +86,36 @@ exports.updateCard = async (req, res) => {
   }
 };
 
+exports.likeCard = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id; // Logged-in user ID
+
+    const card = await Card.findById(id);
+    if (!card) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    // Check if user already liked the card
+    if (card.likes.includes(userId)) {
+      // Unlike the card (remove user from likes array)
+      card.likes = card.likes.filter((like) => like !== userId);
+    } else {
+      // Like the card (add user to likes array)
+      card.likes.push(userId);
+    }
+
+    await card.save();
+
+    res
+      .status(200)
+      .json({ message: "Card like status updated", likes: card.likes });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 
 
