@@ -35,4 +35,30 @@ exports.getCardById = async (req, res) => {
   }
 };
 
+exports.createCard = async (req, res) => {
+  try {
+    // Check if the user is a business user
+    if (!req.user.isBusiness) {
+      return res
+        .status(403)
+        .json({ message: "Only business users can create cards" });
+    }
+
+    // Create new card with user ID
+    const newCard = new Card({
+      ...req.body,
+      user_id: req.user.id,
+    });
+
+    await newCard.save();
+
+    res
+      .status(201)
+      .json({ message: "Card created successfully", card: newCard });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
