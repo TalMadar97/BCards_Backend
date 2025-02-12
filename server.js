@@ -3,6 +3,8 @@ const app = express();
 require("dotenv").config();
 
 const userRoutes = require("./routes/userRoutes");
+const cardRoutes = require("./routes/cardRoutes"); 
+
 const connectDB = require("./config/db");
 const { loggerMiddleware } = require("./loggers/loggerService");
 const corsMiddleware = require("./middlewares/cors");
@@ -17,6 +19,7 @@ app.use(loggerMiddleware());
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/cards", cardRoutes);
 
 const PORT = process.env.PORT || 8181;
 app.listen(PORT, () => {
