@@ -115,6 +115,29 @@ exports.likeCard = async (req, res) => {
   }
 };
 
+exports.deleteCard = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const card = await Card.findById(id);
+
+    if (!card) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    // Only the creator of the card or an admin can delete it
+    if (req.user.id !== card.user_id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    await Card.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Card deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 
 
