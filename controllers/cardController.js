@@ -60,5 +60,32 @@ exports.createCard = async (req, res) => {
   }
 };
 
+exports.updateCard = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const card = await Card.findById(id);
+
+    if (!card) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    // Only the creator of the card can update it
+    if (req.user.id !== card.user_id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const updatedCard = await Card.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    res
+      .status(200)
+      .json({ message: "Card updated successfully", card: updatedCard });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 

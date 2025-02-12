@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getAllCards, getUserCards, getCardById, createCard } = require("../controllers/cardController");
+const { getAllCards, getUserCards, getCardById, createCard, updateCard } = require("../controllers/cardController");
 const { authenticate } = require("../middlewares/authMiddleware");
 
 // Get all cards (Public)
@@ -14,5 +14,8 @@ router.get("/:id", getCardById);
 
 // Create a new card (Only Business Users)
 router.post("/", authenticate, createCard);
+
+// Update a card (Only the creator)
+router.put("/:id", authenticate, updateCard);
 
 module.exports = router;
