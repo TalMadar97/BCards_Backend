@@ -76,11 +76,11 @@ exports.loginUser = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { id: user._id, isBusiness: user.isBusiness, isAdmin: user.isAdmin },
+      { _id: user._id, isBusiness: user.isBusiness, isAdmin: user.isAdmin },
       process.env.JWT_SECRET
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json(token);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

@@ -56,6 +56,7 @@ exports.createCard = async (req, res) => {
       .status(201)
       .json({ message: "Card created successfully", card: newCard });
   } catch (error) {
+    console.error("Error creating card: ", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -89,7 +90,7 @@ exports.updateCard = async (req, res) => {
 exports.likeCard = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id; // Logged-in user ID
+    const userId = req.user._id; // Logged-in user ID
 
     const card = await Card.findById(id);
     if (!card) {
