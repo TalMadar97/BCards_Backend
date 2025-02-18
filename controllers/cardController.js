@@ -11,7 +11,7 @@ exports.getAllCards = async (req, res) => {
 
 exports.getUserCards = async (req, res) => {
   try {
-    const userId = req.user.id; // Get logged-in user ID
+    const userId = req.user._id; // Get logged-in user ID
     const userCards = await Card.find({ user_id: userId });
 
     res.status(200).json(userCards);
@@ -47,7 +47,7 @@ exports.createCard = async (req, res) => {
     // Create new card with user ID
     const newCard = new Card({
       ...req.body,
-      user_id: req.user.id,
+      user_id: req.user._id,
     });
 
     await newCard.save();
@@ -71,7 +71,7 @@ exports.updateCard = async (req, res) => {
     }
 
     // Only the creator of the card can update it
-    if (req.user.id !== card.user_id.toString()) {
+    if (req.user._id !== card.user_id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -126,7 +126,7 @@ exports.deleteCard = async (req, res) => {
     }
 
     // Only the creator of the card or an admin can delete it
-    if (req.user.id !== card.user_id.toString() && !req.user.isAdmin) {
+    if (req.user._id !== card.user_id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -137,9 +137,3 @@ exports.deleteCard = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-
-
-
-
-

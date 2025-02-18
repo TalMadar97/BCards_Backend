@@ -8,7 +8,6 @@ const { updateUserById } = require("../services/userService");
 const updateUserValidation = require("../helpers/updateValidation");
 const booleanValidation = require("../helpers/booleanValidation");
 
-
 // Register User function
 exports.registerUser = async (req, res) => {
   try {
@@ -101,7 +100,7 @@ exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (req.user.id !== id && !req.user.isAdmin) {
+    if (req.user._id !== id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -122,7 +121,7 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
 
     // Ensure the requesting user is updating their own profile or is an admin
-    if (req.user.id !== id && !req.user.isAdmin) {
+    if (req.user._id !== id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -172,7 +171,7 @@ exports.toggleBusinessStatus = async (req, res) => {
     }
 
     // Check if the user is authorized to change this status
-    if (req.user.id !== user._id.toString() && !req.user.isAdmin) {
+    if (req.user._id !== user._id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -194,7 +193,7 @@ exports.deleteUser = async (req, res) => {
     const { id } = req.params;
 
     // Ensure the requesting user is deleting their own account or is an admin
-    if (req.user.id !== id && !req.user.isAdmin) {
+    if (req.user._id !== id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -209,4 +208,3 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
