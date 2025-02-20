@@ -115,30 +115,25 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-//Update User
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Ensure the requesting user is updating their own profile or is an admin
     if (req.user._id !== id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    // Prevent updates to email and password
     if (req.body.email || req.body.password) {
       return res
         .status(400)
         .json({ message: "Email and password cannot be changed" });
     }
 
-    // Validate request payload using Joi
     const { error } = updateUserValidation(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Call the user service to update the user
     const updatedUser = await updateUserById(id, req.body);
 
     if (!updatedUser) {
@@ -153,29 +148,24 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// change isBusiness Boolean
 exports.toggleBusinessStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate request payload using Joi
     const { error } = booleanValidation(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Find the user
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the user is authorized to change this status
     if (req.user._id !== user._id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    // Update the boolean value
     user.isBusiness = req.body.isBusiness;
     await user.save();
 
@@ -187,17 +177,14 @@ exports.toggleBusinessStatus = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-// Delete User
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Ensure the requesting user is deleting their own account or is an admin
     if (req.user._id !== id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    // Find and delete the user
     const user = await User.findByIdAndDelete(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
