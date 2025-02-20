@@ -1,6 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { getAllCards, getUserCards, getCardById, createCard, updateCard, likeCard, deleteCard } = require("../controllers/cardController");
+const {
+  getAllCards,
+  getUserCards,
+  getCardById,
+  createCard,
+  updateCard,
+  likeCard,
+  deleteCard,
+  updateBizNumber,
+} = require("../controllers/cardController");
 const { authenticate } = require("../middlewares/authMiddleware");
 
 // Get all cards (Public)
@@ -9,7 +18,7 @@ router.get("/", getAllCards);
 // Get user's own cards (Authenticated users)
 router.get("/my-cards", authenticate, getUserCards);
 
-// Get a specific card by ID 
+// Get a specific card by ID
 router.get("/:id", getCardById);
 
 // Create a new card (Only Business Users)
@@ -23,5 +32,8 @@ router.patch("/:id", authenticate, likeCard);
 
 // Delete a card (Only the creator or an admin)
 router.delete("/:id", authenticate, deleteCard);
+
+// Admin can update the business number if it's not already taken
+router.patch("/:id/biz-number", authenticate, updateBizNumber);
 
 module.exports = router;

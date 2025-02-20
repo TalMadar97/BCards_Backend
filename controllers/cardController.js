@@ -11,7 +11,7 @@ exports.getAllCards = async (req, res) => {
 
 exports.getUserCards = async (req, res) => {
   try {
-    const userId = req.user._id; // Get logged-in user ID
+    const userId = req.user._id;
     const userCards = await Card.find({ user_id: userId });
 
     res.status(200).json(userCards);
@@ -22,7 +22,7 @@ exports.getUserCards = async (req, res) => {
 
 exports.getCardById = async (req, res) => {
   try {
-    const { id } = req.params; // Extract card ID from URL
+    const { id } = req.params;
     const card = await Card.findById(id);
 
     if (!card) {
@@ -37,14 +37,12 @@ exports.getCardById = async (req, res) => {
 
 exports.createCard = async (req, res) => {
   try {
-    // Check if the user is a business user
     if (!req.user.isBusiness) {
       return res
         .status(403)
         .json({ message: "Only business users can create cards" });
     }
 
-    // Create new card with user ID
     const newCard = new Card({
       ...req.body,
       user_id: req.user._id,
@@ -70,7 +68,6 @@ exports.updateCard = async (req, res) => {
       return res.status(404).json({ message: "Card not found" });
     }
 
-    // Only the creator of the card can update it
     if (req.user._id !== card.user_id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
@@ -90,19 +87,16 @@ exports.updateCard = async (req, res) => {
 exports.likeCard = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id; // Logged-in user ID
+    const userId = req.user._id;
 
     const card = await Card.findById(id);
     if (!card) {
       return res.status(404).json({ message: "Card not found" });
     }
 
-    // Check if user already liked the card
     if (card.likes.includes(userId)) {
-      // Unlike the card (remove user from likes array)
       card.likes = card.likes.filter((like) => like !== userId);
     } else {
-      // Like the card (add user to likes array)
       card.likes.push(userId);
     }
 
@@ -125,7 +119,6 @@ exports.deleteCard = async (req, res) => {
       return res.status(404).json({ message: "Card not found" });
     }
 
-    // Only the creator of the card or an admin can delete it
     if (req.user._id !== card.user_id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
@@ -133,6 +126,41 @@ exports.deleteCard = async (req, res) => {
     await Card.findByIdAndDelete(id);
 
     res.status(200).json({ message: "Card deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+exports.updateBizNumber = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { bizNumber } = req.body;
+
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const existingCard = await Card.findOne({ bizNumber });
+    if (existingCard) {
+      return res.status(400).json({
+        message: "Business number is already in use by another card.",
+      });
+    }
+
+    const updatedCard = await Card.findByIdAndUpdate(
+      id,
+      { bizNumber },
+      { new: true }
+    );
+
+    if (!updatedCard) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    res.status(200).json({
+      message: "Business number updated successfully",
+      card: updatedCard,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
